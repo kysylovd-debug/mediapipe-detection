@@ -90,10 +90,7 @@ function startFaceDetection() {
   let latestFaceResults = null;
   let latestHandResults = null;
 
-  // Variables détection hochement de tête
-  let previousNoseY = null;
-  let nodCount = 0;
-  let alreadyOpened = false;
+  let fistDetected = false;
 
   function drawResults() {
     if (!latestFaceResults && !latestHandResults) return;
@@ -164,43 +161,51 @@ function startFaceDetection() {
     ctx.restore();
   }
 
+  function dist2D(a, b) {
+    return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+  }
+
+  function isFist(landmarks) {
+    const thumbTip = landmarks[4];
+    const indexTip = landmarks[8];
+    const middleTip = landmarks[12];
+    const ringTip = landmarks[16];
+    const pinkyTip = landmarks[20];
+
+    const threshold = 0.1;
+
+    return (
+      dist2D(thumbTip, indexTip) < threshold &&
+      dist2D(thumbTip, middleTip) < threshold &&
+      dist2D(thumbTip, ringTip) < threshold &&
+      dist2D(thumbTip, pinkyTip) < threshold
+    );
+  }
+
   faceMesh.onResults((results) => {
     latestFaceResults = results;
-
-    if (
-      results.multiFaceLandmarks &&
-      results.multiFaceLandmarks.length > 0
-    ) {
-      const noseTip = results.multiFaceLandmarks[0][1];
-      const currentNoseY = noseTip.y;
-
-      if (previousNoseY !== null) {
-        const deltaY = currentNoseY - previousNoseY;
-
-        if (deltaY > 0.03) {
-          nodCount++;
-          statusText.textContent = 'Mouvement tête vers le bas détecté...';
-        } else if (deltaY < -0.03 && nodCount >= 1) {
-          if (!alreadyOpened) {
-            alreadyOpened = true;
-            statusText.textContent = 'Hochement de tête détecté !';
-            ouvrirClassroomOnglets();
-          }
-          nodCount = 0;
-        } else {
-          statusText.textContent = 'En attente de hochement...';
-        }
-      }
-      previousNoseY = currentNoseY;
-    } else {
-      statusText.textContent = 'Visage non détecté';
-    }
-
     drawResults();
   });
 
   hands.onResults((results) => {
     latestHandResults = results;
+
+    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+      const landmarks = results.multiHandLandmarks[0];
+      if (isFist(landmarks)) {
+        if (!fistDetected) {
+          fistDetected = true;
+          ouvrirClassroomOnglets();
+          statusText.textContent = "Poing fermé détecté !";
+        }
+      } else {
+        fistDetected = false;
+        statusText.textContent = "Main ouverte ou autre geste";
+      }
+    } else {
+      statusText.textContent = "Main non détectée";
+    }
+
     drawResults();
   });
 
@@ -226,7 +231,7 @@ function startFaceDetection() {
     });
 
     setTimeout(() => {
-      alreadyOpened = false;
+      fistDetected = false;
     }, 20000);
   }
 }
