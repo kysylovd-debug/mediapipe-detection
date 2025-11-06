@@ -15,14 +15,25 @@ const videoWidth = "480px";
 let keySequence = "";
 const secretCode = "ISMT";
 
-document.addEventListener("keypress", (e) => {
-  const key = e.key.toUpperCase();
-  keySequence += key;
-  if (keySequence.length > secretCode.length)
-    keySequence = keySequence.slice(-secretCode.length);
-  if (keySequence === secretCode) {
-    unlockSecret();
-    keySequence = "";
+document.addEventListener("DOMContentLoaded", () => {
+  enableWebcamButton = document.getElementById("webcamButton");
+  enableWebcamButton.disabled = true;
+
+  document.addEventListener("keypress", (e) => {
+    const key = e.key.toUpperCase();
+    keySequence += key;
+    if (keySequence.length > secretCode.length)
+      keySequence = keySequence.slice(-secretCode.length);
+    if (keySequence === secretCode) {
+      unlockSecret();
+      keySequence = "";
+    }
+  });
+
+  if (hasGetUserMedia()) {
+    enableWebcamButton.addEventListener("click", enableCam);
+  } else {
+    console.warn("getUserMedia() n'est pas supporté par votre navigateur");
   }
 });
 
@@ -52,17 +63,9 @@ const video = document.getElementById("webcam");
 const canvasElement = document.getElementById("output_canvas");
 const canvasCtx = canvasElement.getContext("2d");
 const gestureOutput = document.getElementById("gesture_output");
-enableWebcamButton = document.getElementById("webcamButton");
-enableWebcamButton.disabled = true; // désactivé jusqu'à ISMT
 
 function hasGetUserMedia() {
   return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-}
-
-if (hasGetUserMedia()) {
-  enableWebcamButton.addEventListener("click", enableCam);
-} else {
-  console.warn("getUserMedia() n'est pas supporté par votre navigateur");
 }
 
 async function enableCam() {
@@ -139,8 +142,7 @@ async function predictWebcam() {
     const handedness = results.handednesses[0][0].displayName;
     gestureOutput.innerText = `GestureRecognizer: ${categoryName}\n Confidence: ${categoryScore} %\n Handedness: ${handedness}`;
 
-    // Exemple : ouvre les liens en fonction des gestes
-    // Ici à personnaliser selon tes besoins
+    // Exemple d'action en fonction du geste détecté
     // if (categoryName === "Closed_Fist") ouvrirClassroomOnglets();
   } else {
     gestureOutput.style.display = "none";
@@ -152,7 +154,7 @@ async function predictWebcam() {
 
 function ouvrirClassroomOnglets() {
   const classroomUrls = [
-    "https://classroom.google.com/u/0/c/MTExMTExMTExMTEx", // Remplace avec vrais liens
+    "https://classroom.google.com/u/0/c/MTExMTExMTExMTEx", // Remplace par vrais liens
     "https://classroom.google.com/u/0/c/MTExMTExMTExMTEx",
     "https://classroom.google.com/u/0/c/MTExMTExMTExMTEx"
   ];
