@@ -1,16 +1,63 @@
-.secret-section {
-  margin-top: 40px;
-  overflow: hidden;
+body {
+  font-family: roboto;
+  margin: 2em;
+  color: #3d3d3d;
+  --mdc-theme-primary: #007f8b;
+  --mdc-theme-on-primary: #f1f3f4;
 }
-.unlock-notification {
-  position: fixed;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  background: #000; color: white; padding: 30px 50px;
-  font-size: 1.5em; font-weight: 300; z-index: 1000;
+
+h1 {
+  color: #007f8b;
+}
+
+h2 {
+  clear: both;
+}
+
+video {
+  clear: both;
+  display: none; /* cam invisible */
+  transform: rotateY(180deg);
+  height: 280px;
+}
+
+section {
+  opacity: 0;
+  transition: opacity 500ms ease-in-out;
+}
+
+section.invisible {
+  opacity: 0;
+  pointer-events: none;
+}
+
+section:not(.invisible) {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.detectOnClick {
+  position: relative;
+  float: left;
+  width: 48%;
+  margin: 2% 1%;
+  cursor: pointer;
+}
+
+.canvas {
+  z-index: 1;
+  position: absolute;
+  pointer-events: none;
+}
+
+.output_canvas {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+  -moz-transform: rotateY(180deg);
+}
+
+.output {
   display: none;
-}
-canvas {
-  /* Si tu veux masquer: */
-  /* display: none; */
+  width: 100%;
+  font-size: calc(8px + 1.2vw);
 }
