@@ -53,9 +53,9 @@ function unlockSecret() {
 }
 
 function startFaceDetection() {
-  // On ne montre plus le flux vidéo, seulement le canvas
   const canvas = document.getElementById("output");
   const ctx = canvas.getContext("2d");
+  const statusText = document.getElementById("status");
 
   const video = document.createElement("video");
   video.setAttribute("autoplay", true);
@@ -87,7 +87,6 @@ function startFaceDetection() {
     minTrackingConfidence: 0.5,
   });
 
-  // États de stockage des derniers résultats
   let latestFaceResults = null;
   let latestHandResults = null;
 
@@ -96,7 +95,6 @@ function startFaceDetection() {
   let nodCount = 0;
   let alreadyOpened = false;
 
-  // Fonction pour dessiner en fusion
   function drawResults() {
     if (!latestFaceResults && !latestHandResults) return;
 
@@ -169,12 +167,11 @@ function startFaceDetection() {
   faceMesh.onResults((results) => {
     latestFaceResults = results;
 
-    // Détection simplifiée hochement de tête
     if (
       results.multiFaceLandmarks &&
       results.multiFaceLandmarks.length > 0
     ) {
-      const noseTip = results.multiFaceLandmarks[0][1]; // landmark 1 = nez
+      const noseTip = results.multiFaceLandmarks[0][1];
       const currentNoseY = noseTip.y;
 
       if (previousNoseY !== null) {
@@ -182,15 +179,21 @@ function startFaceDetection() {
 
         if (deltaY > 0.03) {
           nodCount++;
+          statusText.textContent = 'Mouvement tête vers le bas détecté...';
         } else if (deltaY < -0.03 && nodCount >= 1) {
           if (!alreadyOpened) {
             alreadyOpened = true;
+            statusText.textContent = 'Hochement de tête détecté !';
             ouvrirClassroomOnglets();
           }
           nodCount = 0;
+        } else {
+          statusText.textContent = 'En attente de hochement...';
         }
       }
       previousNoseY = currentNoseY;
+    } else {
+      statusText.textContent = 'Visage non détecté';
     }
 
     drawResults();
@@ -213,7 +216,7 @@ function startFaceDetection() {
 
   function ouvrirClassroomOnglets() {
     const classroomUrls = [
-      "https://classroom.google.com/u/0/c/MTExMTExMTExMTEx", // Remplace avec vrai liens
+      "https://classroom.google.com/u/0/c/MTExMTExMTExMTEx", // Remplace avec vrais liens
       "https://classroom.google.com/u/0/c/MTExMTExMTExMTEx",
       "https://classroom.google.com/u/0/c/MTExMTExMTExMTEx",
     ];
@@ -224,7 +227,6 @@ function startFaceDetection() {
 
     setTimeout(() => {
       alreadyOpened = false;
-    }, 20000); // réactivation après 20s
+    }, 20000);
   }
 }
-
