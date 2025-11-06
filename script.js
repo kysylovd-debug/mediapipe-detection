@@ -98,5 +98,66 @@ async function predictWebcam() {
     await gestureRecognizer.setOptions({ runningMode: "VIDEO" });
   }
   let nowInMs = Date.now();
-  if (
+  if (video.currentTime !== lastVideoTime) {
+    lastVideoTime = video.currentTime;
+    results = await gestureRecognizer.recognizeForVideo(video, nowInMs);
+  }
 
+  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+  const drawingUtils = new DrawingUtils(canvasCtx);
+
+  canvasElement.style.height = videoHeight;
+  video.style.height = videoHeight;
+  canvasElement.style.width = videoWidth;
+  video.style.width = videoWidth;
+
+  if (results.landmarks) {
+    for (const landmarks of results.landmarks) {
+      drawingUtils.drawConnectors(
+        landmarks,
+        GestureRecognizer.HAND_CONNECTIONS,
+        {
+          color: "#00FF00",
+          lineWidth: 5
+        }
+      );
+      drawingUtils.drawLandmarks(landmarks, {
+        color: "#FF0000",
+        lineWidth: 2
+      });
+    }
+  }
+
+  if (results.gestures.length > 0) {
+    gestureOutput.style.display = "block";
+    gestureOutput.style.width = videoWidth;
+    const categoryName = results.gestures[0][0].categoryName;
+    const categoryScore = parseFloat(
+      results.gestures[0][0].score * 100
+    ).toFixed(2);
+    const handedness = results.handednesses[0][0].displayName;
+    gestureOutput.innerText = `GestureRecognizer: ${categoryName}\n Confidence: ${categoryScore} %\n Handedness: ${handedness}`;
+
+    // Exemple : ouvre les liens en fonction des gestes
+    // Ici à personnaliser selon tes besoins
+    // if (categoryName === "Closed_Fist") ouvrirClassroomOnglets();
+  } else {
+    gestureOutput.style.display = "none";
+  }
+  if (webcamRunning === true) {
+    window.requestAnimationFrame(predictWebcam);
+  }
+}
+
+function ouvrirClassroomOnglets() {
+  const classroomUrls = [
+    "https://classroom.google.com/u/0/c/MTExMTExMTExMTEx", // Remplace avec vrais liens
+    "https://classroom.google.com/u/0/c/MTExMTExMTExMTEx",
+    "https://classroom.google.com/u/0/c/MTExMTExMTExMTEx"
+  ];
+
+  classroomUrls.forEach((url) => {
+    window.open(url, "_blank");
+  });
+}
