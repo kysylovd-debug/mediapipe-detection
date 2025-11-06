@@ -1,26 +1,21 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8" />
-<title>Détection MediaPipe</title>
-<link rel="stylesheet" href="style.css" />
-</head>
-<body>
-<div id="secretSection" class="secret-section" style="display:none;">
-  <canvas id="output" width="640" height="480"></canvas>
-</div>
-<div id="notification" class="unlock-notification" style="display:none;">
-  Détection activée
-</div>
+<link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
 
-<div id="status" style="position: fixed; bottom: 20px; left: 20px; background: rgba(0,0,0,0.7); color: white; padding: 10px; border-radius: 5px; font-family: Arial; z-index: 1000;">
-  En attente de détection...
-</div>
+<h1>Reconnaissance de gestes avec MediaPipe HandGestureRecognizer</h1>
 
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<section id="demos" class="invisible">
+  <h2>Demo: Reconnaissance de gestes</h2>
+  <p>Utilise ta main devant la caméra pour reconnaître les gestes et déclencher des actions. Appuie sur "ENABLE WEBCAM" pour commencer.</p>
 
-<script type="module" src="script.js"></script>
-</body>
-</html>
+  <div id="liveView" class="videoView">
+    <button id="webcamButton" class="mdc-button mdc-button--raised">
+      <span class="mdc-button__ripple"></span>
+      <span class="mdc-button__label">ENABLE WEBCAM</span>
+    </button>
+    <div style="position: relative;">
+      <video id="webcam" autoplay playsinline></video>
+      <canvas class="output_canvas" id="output_canvas" width="1280" height="720" style="position: absolute; left: 0; top: 0;"></canvas>
+      <p id="gesture_output" class="output"></p>
+    </div>
+  </div>
+</section>
